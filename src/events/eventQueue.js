@@ -2,10 +2,21 @@ const { Queue } = require("bullmq");
 const { createClient } = require("redis");
 require("dotenv").config();
 
-const connection = createClient({ url: process.env.REDIS_URL });
+const redisClient = createClient({ url: process.env.REDIS_URL });
 
-const eventQueue = new Queue("product-events", {defaultJobOptions:retry,
-  connection,
+redisClient.on("error", (err) => console.error("Redis Client Error", err));
+
+
+(async () => {
+  await redisClient.connect();
+})();
+
+const productQueue = new Queue("product-events", {
+  connection: redisClient,
+  defaultJobOptions: {
+    removeOnComplete: true,
+    attempts: 3,
+  },
 });
 
-module.exports = eventQueue;
+module.exports = productQueue;
