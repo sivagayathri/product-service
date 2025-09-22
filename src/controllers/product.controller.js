@@ -1,6 +1,6 @@
 const express = require("express");
 const Product = require("../models/product.model");
-const productQueue = require("../queue/productQueue");
+const productQueue = require("../events/eventQueue");
 
 const router = express.Router();
 
