@@ -8,16 +8,15 @@ const app = express();
 app.use(express.json());
 
 // DB Connection
-mongoose.connect(process.env.MONGO_DB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_DB)
 .then(() => console.log('Connected to MongoDB...'))
 .catch(err => console.log('Could not connect to MongoDB...', err));
 
 // Routes
 const productRoutes = require('./controllers/product.controller');
 app.use('/product', productRoutes);
+
+require('./worker/worker');
 
 // Start Server
 app.listen(process.env.PORT, () => {
