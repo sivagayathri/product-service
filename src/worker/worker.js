@@ -30,6 +30,28 @@ const worker = new Worker(
       
       }
     }
+    
+    if (job.name === 'decrease-stock') {
+  
+    const { productId, quantity } = job.data;
+
+    const product = await Product.findOne({ sku: productId });
+
+    if (!product) throw new Error(`Product with SKU ${productId} not found`);
+
+    if (product.stock < quantity) {
+      throw new Error(`Not enough stock for SKU ${productId}`);
+    }
+
+    product.stock -= quantity;
+    await product.save();
+
+    await productQueue.add('stock_decreased', { sku: productId, newStock: product.stock });
+
+    console.log(`Stock decreased for SKU ${productId}, new stock: ${product.stock}`);
+}
+
+
   },
   { connection } 
 );
